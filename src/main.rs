@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 use std::io::{
-    Read, Write, ErrorKind, Seek
+    Read, Write, ErrorKind, Seek, SeekFrom
 };
 use byteorder::{LittleEndian, ReadBytesExt};
 
@@ -11,12 +11,16 @@ struct SPCSection {
     size: u16,
 }
 
+const SPC_OFFSET : u64 = 0x180000;
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 {
         let filename = &args[1];
         let mut file = fs::File::open(filename)
             .expect("Couldn't open the provided file.");
+        let _ = file.seek(SeekFrom::Start(SPC_OFFSET))
+            .expect("Couldn't seek to SPC offset.");
             
         let mut sections: Vec<SPCSection> = Vec::new();
         loop {
@@ -25,13 +29,17 @@ fn main() {
                             .expect("Failed reading desination address.");
             match file.read_u16::<LittleEndian>() {
                 Ok(v) => section_length = v,
-                Err(ref e) if e.kind() == ErrorKind::UnexpectedEof => break,
+                Err(ref e) if e.kind() == ErrorKind::UnexpectedEof => {
+                    println!("Reached EOF when trying to get section length.");
+                    break;
+                },
                 Err(e) => panic!("Can't read from file: {}, err {}", filename, e),
             }
             
             let destination = file.read_u16::<LittleEndian>()
                 .expect("Failed reading desination address.");
             let out_file_name = format!("{:04x}.bin", destination);
+            println!("Pasring {:04x} bytes for address {:04x}", section_length, destination);
             
             
             if section_length != 0 {
@@ -50,7 +58,7 @@ fn main() {
             }
             
             sections.push(SPCSection {
-                cpu_offset: offset + 0xB08000,
+                cpu_offset: (offset - SPC_OFFSET) + 0xB08000,
                 spc_offset: destination,
                 size: section_length,
             });
