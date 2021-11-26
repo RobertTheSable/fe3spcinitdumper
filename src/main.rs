@@ -21,6 +21,8 @@ fn main() {
         let mut sections: Vec<SPCSection> = Vec::new();
         loop {
             let section_length: u16;
+            let offset: u64 = file.stream_position()
+                            .expect("Failed reading desination address.");
             match file.read_u16::<LittleEndian>() {
                 Ok(v) => section_length = v,
                 Err(ref e) if e.kind() == ErrorKind::UnexpectedEof => break,
@@ -46,8 +48,6 @@ fn main() {
                     panic!("Didn't copy the expected number of bytes.");
                 }
             }
-            let offset: u64 = file.stream_position()
-                            .expect("Failed reading desination address.");
             
             sections.push(SPCSection {
                 cpu_offset: offset + 0xB08000,
@@ -69,10 +69,11 @@ fn main() {
             for section in sections {
                 // write!()? doesn't work even though the docs say it should ¯\_(ツ)_/¯
                 let _ = write!(out_file, "ORG ${:06x}\n", section.cpu_offset);
-                let _ = write!(out_file, "dw ${:04x}\n", section.size);
-                let _ = write!(out_file, "dw ${:04x}\n", section.spc_offset);
+                let _ = write!(out_file, "arch spc700-inline\nORG ${:04x}\n", section.spc_offset);
+                let _ = write!(out_file, "; dw ${:04x}\n", section.size);
+                let _ = write!(out_file, "; dw ${:04x}\n", section.spc_offset);
                 if section.size != 0 {
-                    let _ = write!(out_file, "incsrc {:04x}.s\n\n", section.spc_offset);
+                    let _ = write!(out_file, "incsrc {:04x}.s\narch 65816\n\n", section.spc_offset);
                 }
             }
         }

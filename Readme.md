@@ -8,4 +8,10 @@ You need to copy the SPC data from FE3 to a separate bin file.
 
 The data is located at $B08000 and is 17682 bytes long.
 
-After building, run via: `fe3spcinitdumper spcdata.bin`. Or just `cargo run`.
+After building, run via: `fe3spcinitdumper spcdata.bin`. Or just `cargo run spcdata.bin`.
+
+The program will output separated binary files containing only the SPC code.
+
+It also generates an asm file with the lengths, offsets, and includes for the disassembled binaries.
+
+You will need to disassemble the files with a tool like [this](https://github.com/gocha/spcdas).
