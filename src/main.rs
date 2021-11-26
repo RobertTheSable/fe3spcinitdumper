@@ -69,11 +69,14 @@ fn main() {
             for section in sections {
                 // write!()? doesn't work even though the docs say it should ¯\_(ツ)_/¯
                 let _ = write!(out_file, "ORG ${:06x}\n", section.cpu_offset);
-                let _ = write!(out_file, "arch spc700-inline\nORG ${:04x}\n", section.spc_offset);
-                let _ = write!(out_file, "; dw ${:04x}\n", section.size);
-                let _ = write!(out_file, "; dw ${:04x}\n", section.spc_offset);
                 if section.size != 0 {
+                    let _ = write!(out_file, "arch spc700-inline\nORG ${:04x}\n", section.spc_offset);
+                    let _ = write!(out_file, "; dw ${:04x}\n", section.size);
+                    let _ = write!(out_file, "; dw ${:04x}\n", section.spc_offset);
                     let _ = write!(out_file, "incsrc {:04x}.s\narch 65816\n\n", section.spc_offset);
+                } else {
+                    let _ = write!(out_file, "dw ${:04x}\n", section.size);
+                    let _ = write!(out_file, "dw ${:04x}\n", section.spc_offset);
                 }
             }
         }

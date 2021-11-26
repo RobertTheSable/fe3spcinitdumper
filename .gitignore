@@ -1,5 +1,6 @@
 /target
 *.bin
-*.sfc
+*.sfc*
+*.sum
 *.s
 *.asm
