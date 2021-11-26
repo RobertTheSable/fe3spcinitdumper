@@ -43,8 +43,7 @@ fn main() {
             
             
             if section_length != 0 {
-                let buffer_size = section_length;
-                let mut buffer = vec![0; buffer_size.into()];
+                let mut buffer = vec![0; section_length as usize];
                 
                 file.read_exact(&mut buffer)
                     .expect("Failed reading desination address.");
