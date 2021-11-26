@@ -1,0 +1,11 @@
+[package]
+name = "fe3spcinitdumper"
+description = "Basic program for dumping the SPC code used in FE3."
+version = "0.1.0"
+authors = ["RobertTheSable <rjtulloh@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+byteorder = "1"
